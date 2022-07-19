@@ -1,0 +1,26 @@
+version: '3.8'
+
+services:
+
+  redis-master:
+    build:
+      context: ./redis-conf
+    container_name: redis-master
+    ports:
+      - '6380:6379'
+    volumes:
+      - ./redis-conf/redis.conf:/usr/local/etc/redis/redis.conf
+      - redisdb-master:/data/db
+
+  redis-slave:
+    container_name: redis-slave1
+    image: redis:7
+    command:  redis-server --slaveof redis-master 6379 --masterauth passwd --requirepass passwd
+    depends_on:
+      - redis-master
+    volumes:
+      - redisdb-slave:/data/db
+
+volumes:
+  redisdb-master: {}
+  redisdb-slave: {}
